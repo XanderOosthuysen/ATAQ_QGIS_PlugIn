@@ -1,5 +1,5 @@
 """
-ATAQ AERMOD Pipeline
+ATAQ QGIS Plugin
 Copyright (C) 2026 ATAQ
 
 This program is free software: you can redistribute it and/or modify
