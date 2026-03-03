@@ -1,5 +1,5 @@
 [general]
-name=ATAQ Exporter
+name=ATAQ_QGIS_Plugin
 qgisMinimumVersion=3.0
 description=Digitize and export source/receptor inventories for the ATAQ AERMOD pipeline.
 version=0.1.0
