@@ -176,8 +176,64 @@ class LayerManager:
         QgsProject.instance().addMapLayer(layer)
         return layer
 
+    def _format_building_form(self, layer):
+        """Applies aliases and organises the QGIS form for the buildings layer (2 group boxes only)."""
+        aliases = {
+            "bld_id": "Building ID",
+            "tier_id": "Tier Level (1=base)",
+            "tier_hgt": "Tier Height (m)",
+            "base_elev": "Base Elevation (m)",
+            "description": "Description",
+        }
+        for field_name, alias in aliases.items():
+            idx = layer.fields().indexOf(field_name)
+            if idx != -1:
+                layer.setFieldAlias(idx, alias)
+
+        config = layer.editFormConfig()
+        config.setLayout(QgsEditFormConfig.TabLayout)
+        root = config.invisibleRootContainer()
+        root.clear()
+
+        grp_id = QgsAttributeEditorContainer("1. Identification", root)
+        grp_id.setIsGroupBox(True)
+        grp_id.addChildElement(QgsAttributeEditorField("bld_id", layer.fields().indexOf("bld_id"), grp_id))
+        grp_id.addChildElement(QgsAttributeEditorField("description", layer.fields().indexOf("description"), grp_id))
+        root.addChildElement(grp_id)
+
+        grp_tier = QgsAttributeEditorContainer("2. Tier Parameters", root)
+        grp_tier.setIsGroupBox(True)
+        for f in ("tier_id", "tier_hgt", "base_elev"):
+            idx = layer.fields().indexOf(f)
+            grp_tier.addChildElement(QgsAttributeEditorField(f, idx, grp_tier))
+        root.addChildElement(grp_tier)
+
+        layer.setEditFormConfig(config)
+
+    def create_building_layer(self):
+        """Creates the ATAQ Buildings layer for BPIPPRM building downwash input."""
+        layer = QgsVectorLayer("Polygon?crs=EPSG:4326", "ATAQ_Buildings", "memory")
+        provider = layer.dataProvider()
+
+        fields = [
+            QgsField("bld_id", QVariant.String),
+            QgsField("tier_id", QVariant.Int),
+            QgsField("tier_hgt", QVariant.Double),
+            QgsField("base_elev", QVariant.Double),
+            QgsField("description", QVariant.String),
+        ]
+
+        provider.addAttributes(fields)
+        layer.updateFields()
+
+        self._format_building_form(layer)
+
+        QgsProject.instance().addMapLayer(layer)
+        return layer
+
     def initialize_all_layers(self):
-        """Utility to safely generate all three layers at once."""
+        """Utility to safely generate all layers at once."""
         self.create_point_layer()
         self.create_line_layer()
         self.create_area_layer()
+        self.create_building_layer()

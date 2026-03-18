@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Consistent Blue Background -->
+  <rect x="5" y="5" width="90" height="90" rx="20" fill="#1E3A8A"/>
+
+  <!-- Line Art Folder -->
+  <g stroke="#F97316" stroke-width="6" fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Folder Back -->
+    <path d="M 20,40 L 20,80 L 80,80 L 80,35 L 50,35 L 40,25 L 20,25 Z" />
+    <!-- Folder Front Flap -->
+    <path d="M 20,45 L 80,45 L 75,80 L 20,80 Z" />
+  </g>
+
+  <!-- Bold UP and RIGHT Arrow -->
+  <g stroke="#F97316" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Arrow Shaft -->
+    <line x1="40" y1="55" x2="70" y2="25" />
+    <!-- Arrow Head -->
+    <polyline points="50,25 70,25 70,45" />
+  </g>
+</svg>

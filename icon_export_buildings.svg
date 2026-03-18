@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Consistent Blue Background -->
+  <rect x="5" y="5" width="90" height="90" rx="20" fill="#1E3A8A"/>
+
+  <!-- Stylized Blocky Buildings (Industrial/Office) -->
+  <g stroke="#F97316" stroke-width="6" fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Taller Building (Left) -->
+    <rect x="20" y="30" width="30" height="50" />
+    <!-- Window Lines (Taller Building) -->
+    <line x1="28" y1="40" x2="42" y2="40" stroke-width="4"/>
+    <line x1="28" y1="55" x2="42" y2="55" stroke-width="4"/>
+
+    <!-- Shorter Attached Building (Right) -->
+    <rect x="50" y="50" width="30" height="30" />
+    <!-- Window Lines (Shorter Building) -->
+    <line x1="58" y1="60" x2="72" y2="60" stroke-width="4"/>
+  </g>
+
+  <!-- Exact Same Bold UP and RIGHT Arrow (Linked to Export) -->
+  <g stroke="#F97316" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(10, -5)">
+    <!-- Arrow Shaft (Originating near base) -->
+    <line x1="40" y1="55" x2="70" y2="25" />
+    <!-- Arrow Head -->
+    <polyline points="50,25 70,25 70,45" />
+  </g>
+</svg>
