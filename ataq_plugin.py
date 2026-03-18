@@ -26,23 +26,31 @@ class AtaqPlugin:
         self.iface = iface
         self.plugin_dir = os.path.dirname(__file__)
         self.init_action = None
-        self.export_action = None # <-- NEW ACTION
+        self.export_action = None
+        self.buildings_action = None
 
     def initGui(self):
-        icon_path = os.path.join(self.plugin_dir, 'icon.png')
-        
+        icon_init      = QIcon(os.path.join(self.plugin_dir, 'icon_init_layers.svg'))
+        icon_export    = QIcon(os.path.join(self.plugin_dir, 'icon_export_layers.svg'))
+        icon_buildings = QIcon(os.path.join(self.plugin_dir, 'icon_export_buildings.svg'))
+
         # --- BUTTON 1: Initialize Layers ---
-        self.init_action = QAction(QIcon(icon_path), "1. Initialize ATAQ Layers", self.iface.mainWindow())
+        self.init_action = QAction(icon_init, "1. Initialize ATAQ Layers", self.iface.mainWindow())
         self.init_action.triggered.connect(self.run_init)
         self.iface.addToolBarIcon(self.init_action)
         self.iface.addPluginToMenu("&ATAQ Exporter", self.init_action)
 
         # --- BUTTON 2: Export Inventory ---
-        # (You can use the same icon for now, or add an 'export_icon.png' later)
-        self.export_action = QAction(QIcon(icon_path), "2. Export Inventory", self.iface.mainWindow())
+        self.export_action = QAction(icon_export, "2. Export Inventory", self.iface.mainWindow())
         self.export_action.triggered.connect(self.run_export)
         self.iface.addToolBarIcon(self.export_action)
         self.iface.addPluginToMenu("&ATAQ Exporter", self.export_action)
+
+        # --- BUTTON 3: Export Buildings (BPIPPRM) ---
+        self.buildings_action = QAction(icon_buildings, "3. Export Buildings (BPIPPRM)", self.iface.mainWindow())
+        self.buildings_action.triggered.connect(self.run_export_buildings)
+        self.iface.addToolBarIcon(self.buildings_action)
+        self.iface.addPluginToMenu("&ATAQ Exporter", self.buildings_action)
 
     def unload(self):
         if self.init_action:
@@ -51,6 +59,9 @@ class AtaqPlugin:
         if self.export_action:
             self.iface.removePluginMenu("&ATAQ Exporter", self.export_action)
             self.iface.removeToolBarIcon(self.export_action)
+        if self.buildings_action:
+            self.iface.removePluginMenu("&ATAQ Exporter", self.buildings_action)
+            self.iface.removeToolBarIcon(self.buildings_action)
 
     def run_init(self):
         manager = LayerManager()
@@ -59,6 +70,11 @@ class AtaqPlugin:
             "ATAQ Exporter", "Successfully initialized Memory layers!", level=0, duration=5)
 
     def run_export(self):
-        """Triggers the new exporter logic."""
+        """Exports emissions inventory CSVs."""
         exporter = AtaqExporter(self.iface)
         exporter.export_layers()
+
+    def run_export_buildings(self):
+        """Exports buildings.geojson and stacks.geojson for BPIPPRM."""
+        exporter = AtaqExporter(self.iface)
+        exporter.export_geojson_files()

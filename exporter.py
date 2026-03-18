@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
 import csv
-from qgis.core import QgsProject
+from qgis.core import QgsProject, QgsVectorFileWriter, QgsCoordinateTransformContext
 from qgis.PyQt.QtWidgets import QFileDialog, QMessageBox
 
 class AtaqExporter:
@@ -95,13 +95,72 @@ class AtaqExporter:
             QMessageBox.critical(self.iface.mainWindow(), "Export Errors", "\n".join(errors))
         elif exported_files:
             self.iface.messageBar().pushMessage(
-                "ATAQ Exporter", 
-                f"Successfully exported: {', '.join(exported_files)}", 
+                "ATAQ Exporter",
+                f"Successfully exported: {', '.join(exported_files)}",
                 level=0, duration=5
             )
         else:
             self.iface.messageBar().pushMessage(
-                "ATAQ Exporter", 
-                "No features to export. Draw some sources first!", 
+                "ATAQ Exporter",
+                "No features to export. Draw some sources first!",
+                level=1, duration=5
+            )
+
+    def export_geojson_files(self, export_dir=None):
+        """Exports ATAQ_Buildings and ATAQ_Point_Sources as GeoJSON (WGS84) for BPIPPRM."""
+        if not export_dir:
+            export_dir = QFileDialog.getExistingDirectory(
+                self.iface.mainWindow(),
+                "Select BPIPPRM Export Folder",
+                ""
+            )
+        if not export_dir:
+            return
+
+        geojson_map = {
+            "ATAQ_Buildings": "buildings.geojson",
+            "ATAQ_Point_Sources": "stacks.geojson",
+        }
+
+        exported_files = []
+        errors = []
+
+        for layer_name, filename in geojson_map.items():
+            layers = QgsProject.instance().mapLayersByName(layer_name)
+            if not layers:
+                continue
+            layer = layers[0]
+            if layer.featureCount() == 0:
+                continue
+
+            filepath = os.path.join(export_dir, filename)
+            options = QgsVectorFileWriter.SaveVectorOptions()
+            options.driverName = "GeoJSON"
+            options.fileEncoding = "UTF-8"
+
+            error, msg, _ = QgsVectorFileWriter.writeAsVectorFormatV3(
+                layer,
+                filepath,
+                QgsCoordinateTransformContext(),
+                options,
+            )
+
+            if error == QgsVectorFileWriter.NoError:
+                exported_files.append(filename)
+            else:
+                errors.append(f"Failed to write {filename}: {msg}")
+
+        if errors:
+            QMessageBox.critical(self.iface.mainWindow(), "GeoJSON Export Errors", "\n".join(errors))
+        elif exported_files:
+            self.iface.messageBar().pushMessage(
+                "ATAQ Exporter",
+                f"Successfully exported: {', '.join(exported_files)} to {export_dir}",
+                level=0, duration=5
+            )
+        else:
+            self.iface.messageBar().pushMessage(
+                "ATAQ Exporter",
+                "No buildings or stacks found. Draw features in ATAQ_Buildings first!",
                 level=1, duration=5
             )
